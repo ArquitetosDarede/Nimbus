@@ -1,0 +1,142 @@
+PROPOSTA TECNICA - MIGRACAO PARA AWS
+======================================================================
+
+Cliente: BeFly
+Data: 2026-03-12T20:03:16.900697
+
+## 1. Resumo Executivo
+
+A proposta visa a migração da infraestrutura da BeFly do Azure para a AWS, com foco na transferência de 30 VMs Windows e 10 TB de dados armazenados no Azure Blob. A migração será realizada utilizando o AWS Application Migration Service (MGN) para as VMs e o AWS DataSync para os dados. Este projeto não apenas garantirá uma transição suave, mas também proporcionará benefícios como redução de custos operacionais, maior escalabilidade e acesso a um conjunto mais amplo de serviços da AWS. O cronograma da migração será definido após a confirmação do orçamento e das datas de início e término.
+
+## 2. Contexto e Objetivos do Projeto
+
+A BeFly é uma empresa que busca modernizar sua infraestrutura de TI, migrando de uma solução baseada no Azure para a AWS. Os objetivos principais do projeto incluem:
+
+- **Migração eficiente** de 30 VMs Windows para a AWS.
+- **Transferência segura** de 10 TB de dados de Azure Blob para AWS.
+- **Minimização de downtime** durante a migração.
+- **Aproveitamento de serviços AWS** para otimização de custos e desempenho.
+
+Os critérios de sucesso incluem a conclusão da migração dentro do prazo e do orçamento definidos, além da funcionalidade plena das aplicações após a migração.
+
+## 3. Requisitos de Negócio
+
+- Migrar 30 VMs Windows para AWS.
+- Migrar 10 TB de dados de Azure Blob para AWS.
+
+## 4. Requisitos Técnicos
+
+- Utilizar AWS Application Migration Service (MGN) para a migração das VMs.
+- Utilizar AWS DataSync para a migração dos dados.
+- Garantir segurança e compliance durante todo o processo de migração.
+
+## 5. Escopo de Atividades
+
+As atividades do projeto incluem:
+
+1. **Planejamento da Migração**:
+   - Avaliação do ambiente atual no Azure.
+   - Definição da arquitetura de destino na AWS.
+
+2. **Configuração do AWS MGN**:
+   - Criação de uma conta AWS e configuração do AWS MGN.
+   - Instalação do agente MGN nas VMs Windows.
+
+3. **Configuração do AWS DataSync**:
+   - Criação de um agente DataSync.
+   - Configuração das tarefas de sincronização para transferir dados do Azure Blob para o S3.
+
+4. **Execução da Migração**:
+   - Realização da migração das VMs e dos dados.
+   - Monitoramento contínuo do progresso da migração.
+
+5. **Testes e Validação**:
+   - Testes de funcionalidade das VMs migradas.
+   - Validação da integridade dos dados migrados.
+
+## 6. Arquitetura Proposta
+
+A arquitetura proposta para a BeFly na AWS incluirá:
+
+- **Amazon EC2**: Para hospedar as VMs migradas.
+- **Amazon S3**: Para armazenamento dos dados migrados.
+- **AWS Application Migration Service**: Para facilitar a migração das VMs.
+- **AWS DataSync**: Para transferir dados de forma eficiente e segura.
+- **VPC**: Configuração de uma Virtual Private Cloud para isolar e proteger os recursos.
+
+### Descrição do Diagrama de Arquitetura
+
+O diagrama de arquitetura incluirá uma VPC com sub-redes públicas e privadas, onde as instâncias EC2 estarão localizadas em sub-redes privadas. O AWS DataSync será configurado para transferir dados do Azure Blob para um bucket S3, que será acessado pelas instâncias EC2.
+
+## 7. Infraestrutura como Código (IaC)
+
+A infraestrutura será provisionada utilizando Terraform. Abaixo está um exemplo de configuração para criar um bucket S3 e uma instância EC2.
+
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "beFlyBucket" {
+  bucket = "befly-data-migration"
+  acl    = "private"
+}
+
+resource "aws_instance" "beFlyVM" {
+  ami           = "ami-0c55b159cbfafe1f0" # Exemplo de AMI Windows
+  instance_type = "t2.medium"
+  subnet_id     = aws_subnet.beflySubnet.id
+
+  tags = {
+    Name = "BeFly-Windows-VM"
+  }
+}
+```
+
+## 8. Segurança e Compliance
+
+As medidas de segurança incluirão:
+
+- **IAM**: Configuração de políticas de acesso restrito para usuários e serviços.
+- **Criptografia**: Utilização de criptografia em repouso e em trânsito para dados armazenados no S3.
+- **Auditoria**: Implementação de logs de auditoria para monitorar acessos e atividades.
+
+## 9. Estimativa de Custos
+
+A estimativa de custos para o projeto inclui:
+
+- **Amazon EC2**: Aproximadamente R$ 1.500/mês para 30 instâncias t2.medium.
+- **Amazon S3**: Aproximadamente R$ 500/mês para 10 TB de armazenamento.
+- **AWS Application Migration Service**: Custo baseado no uso, estimado em R$ 300.
+- **AWS DataSync**: Aproximadamente R$ 200 para transferências de dados.
+
+## 10. Cronograma
+
+O cronograma será desenvolvido após a definição do orçamento, mas as fases principais incluem:
+
+1. **Planejamento**: 2 semanas.
+2. **Configuração do MGN e DataSync**: 1 semana.
+3. **Execução da Migração**: 3 semanas.
+4. **Testes e Validação**: 1 semana.
+
+## 11. Riscos e Mitigações
+
+- **Risco**: Downtime inesperado durante a migração.
+  - **Mitigação**: Planejamento de janelas de manutenção e testes prévios.
+
+- **Risco**: Perda de dados durante a transferência.
+  - **Mitigação**: Implementação de backups antes da migração.
+
+## 12. Premissas e Restrições
+
+- **Premissas**: A infraestrutura atual no Azure está em bom estado e pronta para migração.
+- **Restrições**: Necessidade de conformidade com regulamentos de segurança e privacidade de dados.
+
+## 13. Próximos Passos
+
+1. **Definir cronograma e orçamento**: Reunião com a BeFly para discutir detalhes.
+2. **Iniciar planejamento detalhado**: Avaliação do ambiente atual e definição da arquitetura de destino.
+3. **Configuração inicial da AWS**: Criar contas e configurar serviços necessários.
+
+Esta proposta técnica está sujeita a ajustes conforme novas informações e requisitos sejam discutidos.
+

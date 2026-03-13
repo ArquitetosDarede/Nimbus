@@ -1,0 +1,40 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "openai-api-key",
+      "description": "OpenAI API Key",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "notion-api-key",
+      "description": "Notion API Key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "nimbus": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "server"],
+      "env": {
+        "NIMBUS_STRICT_HUMAN_LOOP": "true",
+        "NIMBUS_ENABLE_SECURITY_SCAN": "true",
+        "PYTHONPATH": "${workspaceFolder}/src",
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
+        "OPENAI_API_KEY": "${input:openai-api-key}",
+        "NOTION_API_KEY": "${input:notion-api-key}"
+      }
+    },
+    "notion": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "${input:notion-api-key}"
+      }
+    }
+  }
+}
