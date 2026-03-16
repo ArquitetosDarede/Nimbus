@@ -1,5 +1,5 @@
 """
-Propostas MCP Server
+Nimbus
 
 Exposes proposal generation agents through MCP protocol via OrchestratorAgent.
 The orchestrator coordinates all specialized agents and exposes their functionality.

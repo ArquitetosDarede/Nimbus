@@ -1,5 +1,5 @@
 """
-Propostas MCP Server
+Nimbus
 
 MCP Server for Architecture Proposal Generation System using AWS Strands Agents.
 """
