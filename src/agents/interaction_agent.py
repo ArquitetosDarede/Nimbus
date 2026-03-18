@@ -22,7 +22,7 @@ Your role is to:
 
 Rules:
 - Output must be valid JSON.
-- Keep field paths exactly as requested (example: clientInfo.contactPhone).
+- Keep field paths exactly as requested (example: project.deadline).
 - If a field is not present, do not fill it.
 - Portuguese (Brazil) understanding is required.
 """
@@ -57,25 +57,25 @@ class InteractionAgent:
     def extract_answers(
         self,
         answer_text: str,
-        missing_fields: List[str] | None = None,
+        pending_fields: List[str] | None = None,
         questionnaire: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         """Extract a dictionary of field-path -> value from natural-language response."""
         if not isinstance(answer_text, str) or not answer_text.strip():
             return {
                 "answers": {},
-                "unresolved_fields": missing_fields or [],
+                "unresolved_fields": pending_fields or [],
                 "status": "empty_answer",
             }
 
-        missing_fields = [f for f in (missing_fields or []) if isinstance(f, str) and f.strip()]
+        pending_fields = [f for f in (pending_fields or []) if isinstance(f, str) and f.strip()]
         questionnaire = questionnaire if isinstance(questionnaire, dict) else {}
 
         prompt = f"""
 Extract structured answers from user natural-language text.
 
-MISSING_FIELDS:
-{json.dumps(missing_fields, ensure_ascii=False, indent=2)}
+PENDING_FIELDS:
+{json.dumps(pending_fields, ensure_ascii=False, indent=2)}
 
 QUESTIONNAIRE:
 {json.dumps(questionnaire, ensure_ascii=False, indent=2)}
@@ -93,7 +93,7 @@ Return STRICT JSON format:
   "notes": ["short note"]
 }}
 
-Only include fields from MISSING_FIELDS in "answers".
+Only include fields from PENDING_FIELDS in "answers".
 """
 
         try:
@@ -103,14 +103,22 @@ Only include fields from MISSING_FIELDS in "answers".
                 answers = parsed.get("answers", {})
                 if not isinstance(answers, dict):
                     answers = {}
-                filtered = {
-                    k: v
-                    for k, v in answers.items()
-                    if isinstance(k, str)
-                    and k in missing_fields
-                    and v not in (None, "")
+
+                normalized_pending = {
+                    self._normalize_field_token(field): field for field in pending_fields
                 }
-                unresolved = [f for f in missing_fields if f not in filtered]
+                filtered: Dict[str, Any] = {}
+                for key, value in answers.items():
+                    if not isinstance(key, str) or value in (None, ""):
+                        continue
+                    canonical_key = normalized_pending.get(self._normalize_field_token(key))
+                    if canonical_key:
+                        filtered[canonical_key] = value
+
+                if len(pending_fields) == 1 and not filtered and answer_text.strip():
+                    filtered[pending_fields[0]] = answer_text.strip()
+
+                unresolved = [f for f in pending_fields if f not in filtered]
                 return {
                     "answers": filtered,
                     "unresolved_fields": unresolved,
@@ -121,48 +129,39 @@ Only include fields from MISSING_FIELDS in "answers".
         except Exception:
             logger.exception("[InteractionAgent] Failed to parse with model, applying heuristic fallback")
 
-        fallback = self._heuristic_extract(answer_text, missing_fields)
+        fallback = self._heuristic_extract(answer_text, pending_fields)
         return {
             "answers": fallback,
-            "unresolved_fields": [f for f in missing_fields if f not in fallback],
+            "unresolved_fields": [f for f in pending_fields if f not in fallback],
             "confidence": 0.3,
             "notes": ["fallback_heuristic_used"],
             "status": "fallback",
         }
 
-    def _heuristic_extract(self, answer_text: str, missing_fields: List[str]) -> Dict[str, Any]:
-        """Basic regex fallback for common contact fields."""
+    def _normalize_field_token(self, value: str) -> str:
+        """Normalize a pending field label for stable comparison without hardcoded mappings."""
+        if not isinstance(value, str):
+            return ""
+        return re.sub(r"\s+", " ", value.strip().lower())
+
+    def _heuristic_extract(self, answer_text: str, pending_fields: List[str]) -> Dict[str, Any]:
+        """Generic fallback that does not depend on hardcoded domain fields."""
         text = answer_text.strip()
         out: Dict[str, Any] = {}
 
-        if "clientInfo.contactEmail" in missing_fields:
-            email_match = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
-            if email_match:
-                out["clientInfo.contactEmail"] = email_match.group(0)
-
-        if "clientInfo.contactPhone" in missing_fields:
-            phone_match = re.search(r"\+?\d[\d\s()\-]{7,}\d", text)
-            if phone_match:
-                out["clientInfo.contactPhone"] = phone_match.group(0).strip()
-
-        if "timeline" in missing_fields:
-            timeline_match = re.search(r"\b(\d+\s*(dias|semanas|meses|months|weeks|days))\b", text, re.IGNORECASE)
-            if timeline_match:
-                out["timeline"] = timeline_match.group(1)
-
-        if "budget" in missing_fields:
-            budget_match = re.search(r"(R\$\s?[\d\.,]+|\$\s?[\d\.,]+|\d+[\d\.,]*\s?(mil|mi|milhoes|milhão|k))", text, re.IGNORECASE)
-            if budget_match:
-                out["budget"] = budget_match.group(1)
-
-        if "clientInfo.contactPerson" in missing_fields and "clientInfo.contactPerson" not in out:
-            person_match = re.search(r"(?:contato|responsavel|responsável|pessoa)\s*[:\-]\s*([^,;\n]+)", text, re.IGNORECASE)
-            if person_match:
-                out["clientInfo.contactPerson"] = person_match.group(1).strip()
+        # Try to parse explicit "field: value" pairs and map only to missing fields.
+        for line in re.split(r"[\n;]+", text):
+            pair = re.match(r"^\s*([A-Za-z_][\w]*(?:\.[A-Za-z_][\w]*)*)\s*[:=\-]\s*(.+?)\s*$", line)
+            if not pair:
+                continue
+            key = pair.group(1).strip()
+            value = pair.group(2).strip()
+            if key in pending_fields and value:
+                out[key] = value
 
         # If user answered just one missing field in free text, map directly.
-        if len(missing_fields) == 1 and not out:
-            only_field = missing_fields[0]
+        if len(pending_fields) == 1 and not out:
+            only_field = pending_fields[0]
             if text:
                 out[only_field] = text
 

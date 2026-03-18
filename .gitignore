@@ -19,5 +19,11 @@ env/
 .ruff_cache/
 .mypy_cache/
 
+# Nimbus local Notion cache (SQLite mirror — do not commit)
+.nimbus_cache/
+
+# Scratch/test scripts — isolated, safe to delete
+_scratch/
+
 # IDE settings (keep project-specific VS Code configs tracked if needed)
 .vscode/*.log
