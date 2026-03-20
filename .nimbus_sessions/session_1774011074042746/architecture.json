@@ -1,0 +1,103 @@
+{
+  "solution_summary": "A proposta de arquitetura para Ciclope Corporations envolve a utilização de serviços AWS para realizar o backup de 5TB de dados de vídeo de um ambiente on-premises em Recife, garantindo cópias na região de São Paulo e Norte Virginia. A solução utiliza AWS DataSync para transferência eficiente dos dados, AWS S3 para armazenamento e replicação entre regiões, e AWS Backup para gerenciamento e automação dos backups.",
+  "services": [
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir dados de vídeo de 5TB do ambiente on-premises para a AWS de forma eficiente e segura.",
+      "configuration": "Implantar agentes DataSync em VMware no local para minimizar a latência de rede.",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar dados on-premises para a nuvem AWS."
+    },
+    {
+      "service": "Amazon S3",
+      "purpose": "Armazenar os dados de vídeo na nuvem AWS com alta durabilidade e disponibilidade.",
+      "configuration": "Utilizar a classe de armazenamento S3 Standard para dados frequentemente acessados.",
+      "region": "sa-east-1",
+      "justification": "Armazenamento primário dos dados na região mais próxima do local de origem."
+    },
+    {
+      "service": "Amazon S3 Cross-Region Replication",
+      "purpose": "Replicar dados de vídeo de São Paulo para Norte Virginia para garantir redundância geográfica.",
+      "configuration": "Configurar regras de replicação com métricas de replicação habilitadas.",
+      "region": "us-east-1",
+      "justification": "Garantir cópias dos dados em múltiplas regiões conforme requisitos do cliente."
+    },
+    {
+      "service": "AWS Backup",
+      "purpose": "Gerenciar e automatizar o processo de backup dos dados armazenados no S3.",
+      "configuration": "Criar planos de backup com regras de frequência diária e retenção de 30 dias.",
+      "region": "sa-east-1",
+      "justification": "Automatizar e gerenciar backups para conformidade e recuperação de desastres."
+    }
+  ],
+  "regions": [
+    {
+      "region": "sa-east-1",
+      "purpose": "Proximidade com o local de origem para reduzir latência e custos de transferência."
+    },
+    {
+      "region": "us-east-1",
+      "purpose": "Redundância geográfica e conformidade com requisitos de recuperação de desastres."
+    }
+  ],
+  "data_flow": "Os dados são transferidos do ambiente on-premises em Recife para o S3 na região de São Paulo usando AWS DataSync. Em seguida, os dados são replicados automaticamente para a região de Norte Virginia usando S3 Cross-Region Replication.",
+  "security_controls": [
+    {
+      "control": "Criptografia em repouso",
+      "scope": "Dados armazenados no S3",
+      "implementation": "Utilizar AWS KMS para gerenciar chaves de criptografia."
+    },
+    {
+      "control": "Controle de acesso baseado em IAM",
+      "scope": "Acesso aos serviços AWS",
+      "implementation": "Definir políticas de IAM para restringir acesso a usuários autorizados."
+    },
+    {
+      "control": "Monitoramento de métricas de replicação",
+      "scope": "Processo de replicação de dados",
+      "implementation": "Habilitar métricas de replicação no S3 e monitorar via CloudWatch."
+    }
+  ],
+  "patterns": [
+    "Hub-Spoke",
+    "Active-Passive DR"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Configuração de agentes e otimização de rede para transferência eficiente."
+      },
+      {
+        "component": "Amazon S3",
+        "complexity": "low",
+        "reason": "Configuração simples de armazenamento e replicação."
+      },
+      {
+        "component": "AWS Backup",
+        "complexity": "medium",
+        "reason": "Criação de planos de backup e configuração de regras de retenção."
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual é o prazo para a conclusão do projeto?",
+      "impact": "Permite planejar as etapas de migração e implementação de forma mais precisa.",
+      "priority": "high",
+      "default_assumption": "Assumimos que o projeto deve ser concluído em 3 meses."
+    },
+    {
+      "question": "Qual é o orçamento disponível para este projeto?",
+      "impact": "Ajuda a alinhar a proposta com as expectativas financeiras do cliente.",
+      "priority": "high",
+      "default_assumption": "Assumimos que o orçamento é suficiente para cobrir os serviços AWS recomendados."
+    }
+  ],
+  "assumptions": [
+    "Os dados on-premises estão prontos para transferência imediata.",
+    "A largura de banda disponível é suficiente para a transferência de 5TB de dados em um período razoável."
+  ]
+}

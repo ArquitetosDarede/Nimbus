@@ -1,0 +1,103 @@
+{
+  "solution_summary": "A proposta de arquitetura para Ciclope Corporations envolve a transferência de 5TB de dados de Recife para a AWS, com armazenamento em duas regiões: São Paulo e Norte da Virgínia. Utilizaremos AWS DataSync para a transferência inicial dos dados, AWS S3 para armazenamento e AWS Backup para gerenciamento de backups. A segurança dos dados será garantida através de criptografia e controle de acesso rigoroso.",
+  "services": [
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir dados de Recife para a AWS de forma eficiente e segura.",
+      "configuration": "Configurar agentes DataSync on-premises para transferência inicial dos 5TB de dados.",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar 5TB de dados de Recife para a nuvem AWS."
+    },
+    {
+      "service": "AWS S3",
+      "purpose": "Armazenar dados de vídeo na nuvem com alta durabilidade e disponibilidade.",
+      "configuration": "Utilizar S3 Standard para dados frequentemente acessados e S3 Glacier para arquivamento.",
+      "region": "sa-east-1",
+      "justification": "Armazenamento na nuvem AWS com replicação entre regiões para garantir cópias em SP e Norte Virginia."
+    },
+    {
+      "service": "AWS S3",
+      "purpose": "Armazenar dados de vídeo na nuvem com alta durabilidade e disponibilidade.",
+      "configuration": "Utilizar S3 Standard para dados frequentemente acessados e S3 Glacier para arquivamento.",
+      "region": "us-east-1",
+      "justification": "Armazenamento na nuvem AWS com replicação entre regiões para garantir cópias em SP e Norte Virginia."
+    },
+    {
+      "service": "AWS Backup",
+      "purpose": "Gerenciar e automatizar backups dos dados armazenados no S3.",
+      "configuration": "Configurar políticas de backup para garantir retenção e recuperação de dados.",
+      "region": "sa-east-1",
+      "justification": "Estratégia de backup e recuperação de dados."
+    }
+  ],
+  "regions": [
+    {
+      "region": "sa-east-1",
+      "purpose": "Proximidade geográfica com Recife para menor latência e conformidade local."
+    },
+    {
+      "region": "us-east-1",
+      "purpose": "Redundância e recuperação de desastres, além de conformidade com requisitos de cópia em Norte Virginia."
+    }
+  ],
+  "data_flow": "Os dados serão transferidos de Recife para a AWS usando AWS DataSync, inicialmente para a região sa-east-1. Após a transferência, os dados serão replicados para a região us-east-1 usando a funcionalidade de replicação entre regiões do S3.",
+  "security_controls": [
+    {
+      "control": "Criptografia em repouso e em trânsito",
+      "scope": "Proteção dos dados armazenados e durante a transferência",
+      "implementation": "Utilizar AWS KMS para criptografia de dados em S3 e TLS para dados em trânsito."
+    },
+    {
+      "control": "Controle de acesso baseado em IAM",
+      "scope": "Acesso aos serviços AWS e dados armazenados",
+      "implementation": "Configurar políticas de IAM para restringir acesso apenas a usuários autorizados."
+    }
+  ],
+  "patterns": [
+    "Active-Passive DR"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Configuração inicial e integração com infraestrutura on-premises."
+      },
+      {
+        "component": "AWS S3",
+        "complexity": "low",
+        "reason": "Configuração padrão de buckets e replicação entre regiões."
+      },
+      {
+        "component": "AWS Backup",
+        "complexity": "low",
+        "reason": "Configuração de políticas de backup é direta."
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual o melhor email para contato?",
+      "impact": "Facilitaria a comunicação e envio de atualizações sobre o projeto.",
+      "priority": "high",
+      "default_assumption": "Comunicação será feita através de canais já estabelecidos."
+    },
+    {
+      "question": "Qual é a data limite para a migração?",
+      "impact": "Ajudaria no planejamento e priorização das atividades.",
+      "priority": "high",
+      "default_assumption": "A migração deve ser concluída no prazo padrão de projetos similares."
+    },
+    {
+      "question": "Qual é o orçamento estimado para este projeto?",
+      "impact": "Permite ajustar a solução para atender restrições financeiras.",
+      "priority": "medium",
+      "default_assumption": "O projeto será executado com orçamento padrão para soluções de backup."
+    }
+  ],
+  "assumptions": [
+    "A largura de banda disponível é suficiente para a transferência de 5TB de dados dentro do prazo necessário.",
+    "Não há requisitos de conformidade específicos além dos mencionados para armazenamento e transferência de dados."
+  ]
+}

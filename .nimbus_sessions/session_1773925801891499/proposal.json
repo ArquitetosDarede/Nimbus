@@ -1,0 +1,121 @@
+{
+  "title": "Backup de On-Premises",
+  "sections": [
+    {
+      "title": "1. Formulário de Proposta Técnica",
+      "content": "- A Ciclope Corporations é uma empresa que atua no setor de tecnologia, especializada em soluções de armazenamento e gerenciamento de dados. Com sede em Recife, a empresa possui uma grande quantidade de dados, principalmente arquivos de vídeo, que precisam ser gerenciados de forma eficiente.\n- O projeto visa garantir a migração de 5TB de dados de Recife para a nuvem AWS, assegurando cópias em duas regiões: São Paulo e Norte da Virgínia.\n- Esta proposta refere-se a um projeto de backup de dados on-premises, que inclui a transferência e armazenamento seguro na AWS.\n- O projeto será executado em uma conta AWS que será criada como parte do projeto, utilizando as regiões sa-east-1 (São Paulo) e us-east-1 (Norte da Virgínia).\n- A Darede será responsável por configurar a transferência de dados utilizando AWS DataSync, armazenar os dados no AWS S3 e gerenciar os backups com AWS Backup, enquanto a Ciclope Corporations será responsável por fornecer os acessos necessários e validar a integridade dos dados após a migração."
+    },
+    {
+      "title": "2. Resumo",
+      "content": "- A Ciclope Corporations é uma empresa que atua no setor de tecnologia, especializada em soluções de armazenamento e gerenciamento de dados. Com sede em Recife, a empresa possui uma grande quantidade de dados, principalmente arquivos de vídeo, que precisam ser gerenciados de forma eficiente.\n- O projeto tem como objetivo garantir a migração de 5TB de dados de Recife para a nuvem AWS, assegurando cópias em duas regiões: São Paulo e Norte da Virgínia.\n- A proposta envolve a transferência dos dados utilizando AWS DataSync, armazenamento no AWS S3 e gerenciamento de backups com AWS Backup.\n- O projeto será executado em uma conta AWS que será criada como parte do projeto, utilizando as regiões sa-east-1 (São Paulo) e us-east-1 (Norte da Virgínia).\n- A Darede será responsável por configurar a transferência de dados e gerenciar os backups, enquanto a Ciclope Corporations será responsável por fornecer os acessos necessários e validar a integridade dos dados após a migração."
+    },
+    {
+      "title": "3. Desafio",
+      "content": "- Garantir a transferência de 5TB de dados de Recife para a nuvem AWS utilizando AWS DataSync.\n- Armazenar os dados migrados no AWS S3, com cópias em duas regiões: São Paulo e Norte da Virgínia.\n- Configurar políticas de backup no AWS Backup para assegurar a retenção e recuperação dos dados armazenados.\n- Documentar todo o processo de migração, incluindo as etapas de transferência e configuração de backups.\n- Decomissionar os dados locais após a validação da integridade e disponibilidade dos dados na nuvem."
+    },
+    {
+      "title": "4. Cenário apresentado",
+      "content": "- Atualmente, a Ciclope Corporations possui 5TB de dados armazenados localmente em Recife, principalmente arquivos de vídeo.\n- A infraestrutura atual não possui redundância geográfica, o que limita a segurança e a recuperação de desastres.\n- A equipe de infraestrutura do cliente é composta por 10 profissionais, especializados em gerenciamento de dados e suporte técnico.\n- Não há uma estratégia de backup implementada para os dados locais, o que representa um risco significativo para a integridade das informações.\n- A empresa enfrenta limitações de largura de banda durante a transferência de dados, o que pode impactar o tempo necessário para a migração para a nuvem.\n- A conformidade com regulamentações de dados, como a LGPD, é uma preocupação importante que deve ser considerada durante o processo de migração."
+    },
+    {
+      "title": "5. Arquitetura de solução",
+      "content": "- A solução será hospedada na AWS, utilizando uma conta que será criada como parte do projeto.\n- A transferência de dados de Recife para a AWS será realizada utilizando o AWS DataSync.\n    - Serão configurados agentes DataSync on-premises para a transferência inicial dos 5TB de dados.\n    - Os dados serão transferidos inicialmente para a região sa-east-1 (São Paulo).\n- Após a transferência, os dados serão armazenados no AWS S3.\n    - Utilizará S3 Standard para dados frequentemente acessados e S3 Glacier para arquivamento.\n    - A replicação entre regiões garantirá cópias dos dados na região us-east-1 (Norte da Virgínia).\n- O gerenciamento de backups será realizado com o AWS Backup.\n    - Serão configuradas políticas de backup para garantir a retenção e recuperação dos dados armazenados no S3.\n- A segurança dos dados será garantida através de criptografia em repouso e em trânsito.\n    - Utilizará AWS KMS para criptografia de dados em S3 e TLS para dados em trânsito.\n- O controle de acesso será gerenciado por meio de políticas de IAM, restringindo o acesso apenas a usuários autorizados."
+    },
+    {
+      "title": "6. Escopo de atividades",
+      "content": "<!-- Criado pelo Nimbus -→\n- Planejamento do Projeto\n    - Validar requisitos definidos em proposta\n        - Validar requisitos técnicos \n        - Validar requisitos de negócio \n        - Validar escopos do projeto e entregáveis\n    - Definir responsáveis pelas entregas do projeto \n    - Levantar parâmetros de configuração\n        - Estruturas de nomes\n        - Políticas de tags\n        - Configurações de conectividade\n        - Requisitos de segurança e acessos\n        - Políticas de continuidade do negócio\n    - Documentar o planejamento definido\n- Transferir dados de Recife para a AWS utilizando AWS DataSync\n    - Configurar agentes DataSync on-premises para a transferência inicial dos 5TB de dados.\n    - Realizar a transferência dos dados para a região sa-east-1 (São Paulo).\n- Armazenar os dados no AWS S3\n    - Utilizar S3 Standard para dados frequentemente acessados e S3 Glacier para arquivamento.\n    - Configurar a replicação dos dados para a região us-east-1 (Norte da Virgínia).\n- Configurar políticas de backup no AWS Backup\n    - Estabelecer políticas de retenção e recuperação de dados armazenados no S3.\n- Validar a integridade dos dados após a migração\n    - Realizar testes para garantir que todos os dados foram transferidos corretamente e estão acessíveis.\n- Decomissionar dados locais após a validação\n    - Garantir que todos os dados estejam na nuvem AWS antes de remover os dados locais.\n\n| Título do Escopo | Horas Mínimas | Horas Médias | BU Autoridade |\n|------------------|---------------|--------------|----|\n| Planejamento do Projeto | 21 | 31 | PDM |\n| Transferir dados para AWS | 40 | 60 | Data Migration |\n| Armazenar dados no AWS S3 | 30 | 50 | Data Storage |\n| Configurar políticas de backup | 20 | 30 | Backup Management |\n| Validar integridade dos dados | 15 | 25 | Data Validation |\n| Decomissionar dados locais | 10 | 15 | Data Management |\n| Total | 136 | 211 |  |\n</exemplo>"
+    },
+    {
+      "title": "7. Informações da Proposta Técnica",
+      "content": "- Versão da Proposta Técnica: V1.\n- A Proposta Técnica tem a validade de 60 dias, a partir da data da Proposta Comercial. Após essa data, o conteúdo técnico (Desafio, Arquitetura, Escopo, Critérios de Sucesso e/ou Resultados Esperados não terão mais validade), sendo necessário atualizar a Proposta com a Equipe de Arquitetura/Pré-vendas da DAREDE.\n- Código Verificador Interno: ARCHPSALES20250617V1."
+    },
+    {
+      "title": "8. Premissas",
+      "content": "- A proposta foi desenvolvida baseando-se nas informações fornecidas pela Ciclope Corporations através de: reuniões, trocas de e-mails compartilhados durante a fase de pré-vendas;\n- A Ciclope Corporations é responsável por todos seus dados, backups, softwares, plugins, códigos fonte, branchs e administração de seus repositórios. Todos os procedimentos necessários no caso de qualquer eventualidade que possa ocorrer e por se recuperar de qualquer falha durante a execução das atividades deste projeto, que não tenha relação direta com as mesmas;\n- A Ciclope Corporations será responsável por fornecer os acessos necessários e informações sobre o ambiente para que a contratada possa seguir com o atendimento do ticket/projeto;\n- A Ciclope Corporations fornecerá e se responsabilizará pela aquisição de todo o licenciamento de sistemas operacionais, software e plugins, além dos certificados digitais necessários, que não estiverem cobertos pelos modelos de licenciamento do Provedor de Nuvem ou disponibilizados de maneira simples para contratação em Marketplace, salvo quando expressamente definido como parte da proposta;\n- A Ciclope Corporations deverá designar uma pessoa para disponibilizar toda a informação necessária e contar com conhecimento técnico suficiente, para a boa condução das atividades ou solicitando internamente o que for preciso e atuar junto à equipe técnica da contratada se necessário, com agendamento à combinar entre as partes;\n- Em fase de Projeto, a Ciclope Corporations e a contratada realizarão reuniões estratégicas e de planejamento, utilizando as horas de Setup descritas nessa proposta; caso as atividades planejadas ultrapassem as horas contratadas como \"Setup do Projeto\", poderão ser contratadas horas adicionais de acordo com a necessidade, com o alinhamento prévio e aprovação da Ciclope Corporations e da contratada;\n- Horas de projeto serão utilizadas para planejamento, reuniões, alinhamentos e definição de configurações;\n- Todas as atividades seguirão cronograma estabelecido entre as partes após a ativação do contrato;\n- A Ciclope Corporations e seus colaboradores conhecem e estão de acordo com o modelo de responsabilidade compartilhada da AWS;\n- Os custos de infraestrutura apresentados devem ser considerados como uma estimativa e podem variar conforme o uso real dos serviços;\n- Em caso de adoção de Savings Plans, fica definido que os custos determinados pela política de Savings só serão válidos após a ativação do comprometimento através da console da AWS;"
+    },
+    {
+      "title": "9. Pontos não contemplados por esta proposta",
+      "content": "### Pontos não contemplados por esta proposta\n\nExceto quando expressamente indicados nesta proposta, não estão inclusos no projeto quaisquer serviços de desenho, desenvolvimento, criação, teste, ajuste, configuração, troubleshooting ou quaisquer outros procedimentos ou serviços que tenham a ver com:\n<!-- Geral -->\n- A implantação dos serviços propostos de forma assistida, compartilhada e presencial;\n- A execução de tarefas fora do planejamento, havendo a necessidade, deverá ser previamente acordado novas ações, cronogramas e prazos;\n- Esta proposta não contempla escopos de Disaster Recovery;\n<!-- Monitoramento -->\n- A implementação de quaisquer monitoramentos customizados com ferramenta ou serviço nativo;\n<!-- Desenvolvimento -->\n- Desenvolvimento e/ou refatoração de código (Backend/Frontend, APIs, ETL, Infraestrutura, esteira de CI/CD);\n- Instalação de quaisquer bibliotecas de dependência de código, runtimes ou pacotes de SDK para funcionamento da aplicação;\n<!-- Banco de Dados -->\n- Estruturação e análise de queries, regras de negócio, plano de execução, indexação, saneamento ou interações diretas com os conteúdos de bancos de dados;\n- Migração e/ou implantação de servidores, aplicações e bancos de dados;\n<!-- Infraestrutura e Redes -->\n- Virtualização ou serviços de infraestrutura on-premise ou em outros provedores de nuvem não abordados no escopo desta proposta;\n- Operação de equipamentos de rede de data center, borda, WAN, LAN ou WLAN;\n- Criação e recuperação de backups que não estejam relacionados apenas a boas práticas de execução técnica das atividades contempladas neste projeto;\n- A implementação de novos serviços em cloud ou ambiente diferente dos citados nessa proposta, exceto se documentados e aprovados pela Ciclope Corporations e DAREDE;\n- A definição exata da quantidade de IOPS e throughput a serem utilizados nos discos rígidos dos servidores;\n<!-- Segurança -->\n- Refinamento de regras ou políticas em appliances ou softwares de segurança;\n- A implementação de um SOC 24x7 junto ao time de segurança da contratante;\n- Administração e manutenção das regras de firewall personalizadas de acesso, bloqueio, whitelist e blacklist;\n<!-- Service Desk -->\n- A implementação de um NOC para monitoramento ativo 24x7 dos recursos de nuvem com ferramenta interna da contratada;\n<!-- Licenciamento -->\n- Intermediação ou venda de licenças de software que sejam necessárias para a migração e implementação do ambiente e/ou recursos da solução no provedor de computação em nuvem de destino;\n<!-- Sustentação -->\n- A atualização automatizada ou manual da aplicação da Ciclope Corporations, que poderá ser acompanhada como atividade de sustentação para garantir o funcionamento da infraestrutura, dentro das atribuições técnicas da DAREDE, mas que é de responsabilidade da Ciclope Corporations;"
+    },
+    {
+      "title": "10. Fatores influenciadores",
+      "content": "### Fatores que influenciam cenários de custos\n- A escolha da região impacta diretamente nos custos de transferência e armazenamento dos dados.\n- A possibilidade de reservas e savings plans para os serviços AWS contemplados na proposta pode reduzir os custos.\n  - O tempo de compromisso de reservas e savings plans pode ser de 1 ou 3 anos.\n  - O valor de entrada para reservas e savings plans pode ser nenhum, parcial ou total.\n- A utilização de serviços em Multi-AZ ou Single-AZ pode afetar a disponibilidade e os custos.\n- O uso de instâncias, serviços gerenciados ou serverless também influencia os custos totais do projeto.\n\n### Premissas para cenários de custos\n- Os backups diários terão uma alteração estimada de 2% para volumes EBS associados a instâncias EC2.\n- Os backups diários terão uma alteração estimada de 5% para bancos de dados não gerenciados.\n- Serão realizados 2 backups completos para bancos do RDS, sendo um embutido no serviço e outro com armazenamento adicional.\n- A transferência de dados para fora do ambiente implementado será considerada conforme o padrão.\n\n### Fatores de custos estimados que podem ser refinados\n- O volume de tráfego de saída para a internet a partir da VPC pode variar e impactar os custos.\n- O volume de dados distribuídos pelo CloudFront e sua distribuição regional influenciam os custos operacionais.\n- O volume de tráfego de saída para outras regiões da AWS pode afetar o custo total do projeto.\n- O volume de dados alterado entre snapshots pode impactar os custos de armazenamento.\n- O volume de logs gerados com monitoramento de recursos, atividades e configurações pode influenciar os custos.\n\n### Fatores de custos não contemplados que envolvem análises à parte ou informações adicionais\n- O volume de tráfego intrarregional (entre zonas de disponibilidade) pode não estar incluído nas estimativas.\n- A quantidade de chamadas de API do S3 para diversas operações pode impactar os custos, mas não está detalhada nas estimativas.\n\n### Custos Equipamentos, Licenças ou AWS\nTodas as calculadoras representam uma estimativa de custos.\n- [Titulo da calculadora] - [On-Demand / Savings Plans de 1 ano / 3 anos]\n  - Região: [Região AWS]\n  - Link calculadora: [URL da calculadora AWS]\n  - Upfront cost: X,XXX.XX USD\n  - Monthly cost: X,XXX.XX USD\n  - Yearly cost: XX,XXX.XX USD"
+    },
+    {
+      "title": "11. Resultados esperados",
+      "content": "### Resultados esperados\n\n- Todos os 5TB de dados migrados de Recife para a nuvem AWS utilizando AWS DataSync.\n- Os dados estarão armazenados no AWS S3, com cópias em duas regiões: São Paulo e Norte da Virgínia.\n- As políticas de backup configuradas no AWS Backup garantirão a retenção e recuperação dos dados armazenados.\n- A integridade dos dados será validada após a migração, assegurando que todos os dados estejam acessíveis e corretos.\n- Os dados locais serão decommissionados somente após a confirmação de que todos os dados estão na nuvem AWS e funcionando corretamente.\n\n### Critérios de sucesso:\n- Redução de custos operacionais em até 20% após a migração para a nuvem.\n- Aumento da disponibilidade dos dados, com tempo de inatividade não superior a 1% ao longo do ano.\n- Validação da integridade dos dados com uma taxa de sucesso de 100% após a migração.\n- Conformidade com a LGPD garantida, evitando penalidades legais."
+    },
+    {
+      "title": "12. Estimativa de horas",
+      "content": "- Horas setup 8x5 (mínimas): 136 horas\n- Horas setup 8x5 (médias): 211 horas"
+    },
+    {
+      "title": "13. Próximos passos",
+      "content": "- Apresentação da proposta para a Ciclope Corporations, detalhando a arquitetura e o plano de migração.\n- Ajustes em cenários de custos de acordo com informações adicionais trazidas pelo cliente, como orçamento e prazos.\n- Avaliação por parte da Ciclope Corporations de qual seria a forma de implementação mais alinhada com suas expectativas e necessidades.\n- Escolha do cenário de implantação e eventual ajuste no volume de horas de trabalho de acordo com as atividades selecionadas.\n- Definição de um cronograma para a execução das atividades, incluindo datas para a migração e validação dos dados."
+    }
+  ],
+  "metadata": {
+    "created": "2026-03-19T10:16:25.784436",
+    "client": "Ciclope Corporations",
+    "technologies": [
+      "AWS S3",
+      "AWS Backup",
+      "AWS DataSync"
+    ],
+    "template_sections": [
+      "Formulário de Proposta Técnica",
+      "Resumo",
+      "Desafio",
+      "Cenário apresentado",
+      "Arquitetura de solução",
+      "Escopo de atividades",
+      "Informações da Proposta Técnica",
+      "Premissas",
+      "Pontos não contemplados por esta proposta",
+      "Fatores influenciadores",
+      "Resultados esperados",
+      "Estimativa de horas",
+      "Próximos passos"
+    ],
+    "architecture_summary": "A proposta de arquitetura para Ciclope Corporations envolve a transferência de 5TB de dados de Recife para a AWS, com armazenamento em duas regiões: São Paulo e Norte da Virgínia. Utilizaremos AWS DataSync para a transferência inicial dos dados, AWS S3 para armazenamento e AWS Backup para gerenciamento de backups. A segurança dos dados será garantida através de criptografia e controle de acesso rigoroso.",
+    "security_risk": "medium",
+    "score": 7.5,
+    "score_passed": false,
+    "data_gaps": [
+      {
+        "question": "Qual o melhor email para contato?",
+        "impact": "Facilitaria a comunicação e envio de atualizações sobre o projeto.",
+        "priority": "high",
+        "default_assumption": "Comunicação será feita através de canais já estabelecidos."
+      },
+      {
+        "question": "Qual é a data limite para a migração?",
+        "impact": "Ajudaria no planejamento e priorização das atividades.",
+        "priority": "high",
+        "default_assumption": "A migração deve ser concluída no prazo padrão de projetos similares."
+      },
+      {
+        "question": "Qual é o orçamento estimado para este projeto?",
+        "impact": "Permite ajustar a solução para atender restrições financeiras.",
+        "priority": "medium",
+        "default_assumption": "O projeto será executado com orçamento padrão para soluções de backup."
+      },
+      {
+        "question": "Como será garantida a conformidade com a LGPD durante a transferência e armazenamento dos dados?",
+        "impact": "A conformidade com a LGPD é crucial para evitar penalidades legais e proteger os direitos dos usuários.",
+        "priority": "high",
+        "default_assumption": "Assumimos que a conformidade será gerida internamente pela equipe de Ciclope Corporations."
+      },
+      {
+        "question": "Quais práticas de segurança de rede serão implementadas para proteger a transferência de dados?",
+        "impact": "A falta de segurança de rede pode expor dados sensíveis a interceptações.",
+        "priority": "medium",
+        "default_assumption": "Assumimos que serão utilizadas práticas padrão de segurança de rede da AWS."
+      }
+    ],
+    "assumptions": [
+      "A largura de banda disponível é suficiente para a transferência de 5TB de dados dentro do prazo necessário.",
+      "Não há requisitos de conformidade específicos além dos mencionados para armazenamento e transferência de dados."
+    ]
+  }
+}

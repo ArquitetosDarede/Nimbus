@@ -18,7 +18,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-from agents.orchestrator import OrchestratorAgent
+from agents.orchestrator_v2 import OrchestratorAgent
 from agents.interaction_agent import InteractionAgent
 
 # Configure logging
@@ -32,11 +32,11 @@ try:
     logger.info("Creating AWS Documentation MCP client...")
     aws_mcp_client = create_aws_docs_mcp_client()
     if aws_mcp_client:
-        logger.info("✅ AWS Documentation MCP client started successfully")
+        logger.info("✅ AWS Documentation MCP client created successfully")
     else:
-        logger.info("ℹ️ AWS Documentation MCP client not available — architecture agent will work without it")
+        logger.info("ℹ️ AWS Documentation MCP client not available (npx not found or server not installed)")
 except Exception as e:
-    logger.info(f"ℹ️ AWS Documentation MCP client not available: {e}")
+    logger.warning(f"⚠️ Failed to create AWS Documentation MCP client: {e}")
 
 # Initialize the Notion Cache Layer (local SQLite mirror of the entire workspace)
 notion_cache_layer = None
@@ -558,9 +558,6 @@ async def call_tool(name: str, arguments: Any) -> List[TextContent]:
                     text = str(compact.get("assistant_message", "")).strip() or str(compact.get("status", "")).strip()
                     if not text:
                         text = "Resposta recebida."
-                    # Surface actual error for debugging when generation fails
-                    if not compact.get("success") and isinstance(raw, dict) and raw.get("error"):
-                        text = f"{text} | {raw['error']}"
                     return [TextContent(type="text", text=text)]
             except Exception:
                 pass

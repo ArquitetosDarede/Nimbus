@@ -1,0 +1,96 @@
+{
+  "solution_summary": "A proposta de arquitetura para Ciclope Corporations envolve a transferência de 5TB de dados de vídeo de um ambiente on-premises em Recife para a AWS, com armazenamento em múltiplas regiões para garantir redundância geográfica. Utilizaremos AWS DataSync para a transferência inicial dos dados, AWS S3 para armazenamento, e AWS Backup para gerenciar cópias de segurança em diferentes regiões.",
+  "services": [
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir dados de vídeo de 5TB do ambiente on-premises para a AWS.",
+      "configuration": "Configurar um agente DataSync no ambiente on-premises para transferir dados para um bucket S3 na região de São Paulo.",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar dados para a nuvem AWS antes do decomissionamento local."
+    },
+    {
+      "service": "Amazon S3",
+      "purpose": "Armazenar os dados de vídeo transferidos e configurar replicação entre regiões.",
+      "configuration": "Criar buckets S3 nas regiões de São Paulo e Norte Virginia com replicação cruzada habilitada.",
+      "region": "sa-east-1",
+      "justification": "Armazenamento primário dos dados e replicação para garantir redundância geográfica."
+    },
+    {
+      "service": "AWS Backup",
+      "purpose": "Gerenciar backups dos dados armazenados no S3.",
+      "configuration": "Configurar planos de backup para realizar cópias regulares dos dados entre as regiões de São Paulo e Norte Virginia.",
+      "region": "us-east-1",
+      "justification": "Garantir que os dados estejam seguros e disponíveis em caso de falhas regionais."
+    }
+  ],
+  "regions": [
+    {
+      "region": "sa-east-1",
+      "purpose": "Proximidade com a localização on-premises em Recife para menor latência na transferência inicial."
+    },
+    {
+      "region": "us-east-1",
+      "purpose": "Redundância geográfica e conformidade com requisitos de recuperação de desastres."
+    }
+  ],
+  "data_flow": "Os dados são transferidos do ambiente on-premises em Recife para um bucket S3 na região de São Paulo usando AWS DataSync. Em seguida, os dados são replicados automaticamente para um bucket S3 na região de Norte Virginia usando replicação cruzada do S3.",
+  "security_controls": [
+    {
+      "control": "Criptografia em trânsito",
+      "scope": "Dados transferidos entre on-premises e AWS",
+      "implementation": "Utilizar TLS para criptografar dados durante a transferência com AWS DataSync."
+    },
+    {
+      "control": "Criptografia em repouso",
+      "scope": "Dados armazenados no S3",
+      "implementation": "Habilitar criptografia do lado do servidor com AWS KMS para todos os objetos no S3."
+    },
+    {
+      "control": "Controle de acesso",
+      "scope": "Acesso aos buckets S3",
+      "implementation": "Configurar políticas de bucket e IAM para restringir o acesso aos dados apenas a usuários autorizados."
+    }
+  ],
+  "patterns": [
+    "Active-Passive DR",
+    "Cross-Region Replication"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Requer configuração de agentes e tarefas de transferência."
+      },
+      {
+        "component": "Amazon S3",
+        "complexity": "low",
+        "reason": "Configuração de buckets e replicação é direta."
+      },
+      {
+        "component": "AWS Backup",
+        "complexity": "medium",
+        "reason": "Necessita configuração de planos de backup e políticas de retenção."
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual é a data limite para a migração dos dados?",
+      "impact": "Ajudaria a planejar a execução do projeto e garantir que os dados sejam migrados antes do decomissionamento.",
+      "priority": "high",
+      "default_assumption": "Assumimos que a migração deve ser concluída dentro de 3 meses."
+    },
+    {
+      "question": "Qual é o orçamento disponível para este projeto?",
+      "impact": "Permitir definir a arquitetura de forma adequada às limitações financeiras.",
+      "priority": "high",
+      "default_assumption": "Assumimos que não há restrições financeiras significativas."
+    }
+  ],
+  "assumptions": [
+    "A largura de banda disponível é suficiente para transferir 5TB de dados dentro do prazo assumido.",
+    "Não há requisitos de conformidade adicionais além da redundância geográfica."
+  ]
+}

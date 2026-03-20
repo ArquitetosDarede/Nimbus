@@ -50,7 +50,7 @@ class AnalysisAgent:
         self.agent = Agent(
             model=OpenAIModel(
                 client_args={
-                    "max_retries": 0,
+                    "max_retries": 2,
                     "timeout": 90,
                 },
                 model_id="gpt-4o-mini",
@@ -171,5 +171,10 @@ Note: minimize Notion API calls to conserve rate limits.
                     "timestamp": datetime.now().isoformat()
                 }
         except Exception as e:
-            logger.exception("[AnalysisAgent] ERROR")
+            logger.exception("[AnalysisAgent] ERROR — %s: %s", type(e).__name__, e)
+            # Log the full exception chain for diagnosing connection errors
+            cause = e.__cause__ or e.__context__
+            while cause:
+                logger.error("[AnalysisAgent]   caused by %s: %s", type(cause).__name__, cause)
+                cause = getattr(cause, '__cause__', None) or getattr(cause, '__context__', None)
             return {"error": str(e), "status": "analysis_failed"}

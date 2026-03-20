@@ -20,7 +20,6 @@ import logging
 import os
 import random
 import time
-import traceback
 from datetime import datetime
 from typing import Any, Callable, Dict
 
@@ -31,10 +30,10 @@ from .analysis_agent import AnalysisAgent
 from .architecture_agent import ArchitectureAgent
 from .coherence_agent import CoherenceAgent
 from .conversion_agent import ConversionAgent
-from .generation_agent import GenerationAgent
+from .generation_agent_v2 import GenerationAgent
 from .notion_relevance_mapper import NotionRelevanceMapper
 from .score_evaluator_agent import ScoreEvaluatorAgent
-from stores.proposal_store import FileProposalStore
+from ..stores.proposal_store import FileProposalStore
 
 ORCHESTRATOR_PROMPT = """
 You are the Orchestrator Agent that coordinates specialized proposal agents.
@@ -446,8 +445,7 @@ class OrchestratorAgent:
 
                 self._log_step("coherence_regen", {"pass": coherence_pass, "issues": len(issues)})
 
-                # Deduplicate issues by section index — consolidate feedback
-                regen_by_idx: Dict[int, list] = {}
+                # Selective regeneration of problematic sections
                 for issue in issues:
                     if not isinstance(issue, dict):
                         continue
@@ -455,37 +453,33 @@ class OrchestratorAgent:
                     correction = str(issue.get("correction_context", "")).strip()
                     if not target_title or not correction:
                         continue
+
+                    # Find section index
                     for idx, section in enumerate(proposal_sections):
                         if not isinstance(section, dict):
                             continue
                         if target_title.lower() in str(section.get("title", "")).lower():
-                            regen_by_idx.setdefault(idx, []).append(correction)
+                            # Regenerate with feedback
+                            regen_context = dict(generation_context)
+                            regen_context["review_feedback"] = correction
+                            new_content = self._run_with_rate_limit_control(
+                                "coherence_regen_section",
+                                self.generation_agent.writer.generate_section,
+                                section_title=target_title,
+                                context=regen_context,
+                                template_fragment=self.generation_agent._extract_template_fragment(
+                                    template_text, target_title
+                                ),
+                                architecture_contract=json.dumps(architecture, ensure_ascii=False, indent=2),
+                                relevant_notion_content=relevance_content.get(target_title, ""),
+                                existing_sections_summary=self.generation_agent._summarize_existing_sections(
+                                    proposal_sections
+                                ),
+                                review_feedback=correction,
+                            )
+                            if new_content:
+                                proposal_sections[idx]["content"] = str(new_content).strip()
                             break
-
-                # Regenerate each affected section once with consolidated feedback
-                for idx, corrections in regen_by_idx.items():
-                    section = proposal_sections[idx]
-                    target_title = str(section.get("title", "")).strip()
-                    merged_feedback = "\n".join(f"- {c}" for c in corrections)
-                    regen_context = dict(generation_context)
-                    regen_context["review_feedback"] = merged_feedback
-                    new_content = self._run_with_rate_limit_control(
-                        "coherence_regen_section",
-                        self.generation_agent.writer.generate_section,
-                        section_title=target_title,
-                        context=regen_context,
-                        template_fragment=self.generation_agent._extract_template_fragment(
-                            template_text, target_title
-                        ),
-                        architecture_contract=json.dumps(architecture, ensure_ascii=False, indent=2),
-                        relevant_notion_content=relevance_content.get(target_title, ""),
-                        existing_sections_summary=self.generation_agent._summarize_existing_sections(
-                            proposal_sections
-                        ),
-                        review_feedback=merged_feedback,
-                    )
-                    if new_content:
-                        proposal_sections[idx]["content"] = str(new_content).strip()
 
             # ---- 8. SCORE evaluation ----
             self._log_step("score_evaluation_started")
@@ -510,10 +504,8 @@ class OrchestratorAgent:
 
             # Selective regen based on SCORE feedback
             regen_done = 0
-            if not score_passed:
+            if not score_passed and regen_done < self.max_score_regeneration:
                 score_issues = score_result.get("issues", [])
-                # Deduplicate score issues by section index
-                score_regen_by_idx: Dict[int, list] = {}
                 if isinstance(score_issues, list):
                     for issue in score_issues:
                         if not isinstance(issue, dict):
@@ -524,39 +516,34 @@ class OrchestratorAgent:
                         guidance = str(issue.get("correction_guidance", "")).strip()
                         if not target_title or not guidance:
                             continue
+
                         for idx, section in enumerate(proposal_sections):
                             if not isinstance(section, dict):
                                 continue
                             if target_title.lower() in str(section.get("title", "")).lower():
-                                score_regen_by_idx.setdefault(idx, []).append(guidance)
+                                regen_context = dict(generation_context)
+                                regen_context["review_feedback"] = guidance
+                                new_content = self._run_with_rate_limit_control(
+                                    "score_regen_section",
+                                    self.generation_agent.writer.generate_section,
+                                    section_title=target_title,
+                                    context=regen_context,
+                                    template_fragment=self.generation_agent._extract_template_fragment(
+                                        template_text, target_title
+                                    ),
+                                    architecture_contract=json.dumps(architecture, ensure_ascii=False, indent=2),
+                                    relevant_notion_content=relevance_content.get(target_title, ""),
+                                    existing_sections_summary=self.generation_agent._summarize_existing_sections(
+                                        proposal_sections
+                                    ),
+                                    review_feedback=guidance,
+                                )
+                                if new_content:
+                                    proposal_sections[idx]["content"] = str(new_content).strip()
+                                    regen_done += 1
                                 break
-
-                for idx, guidances in score_regen_by_idx.items():
-                    if regen_done >= self.max_score_regeneration:
-                        break
-                    section = proposal_sections[idx]
-                    target_title = str(section.get("title", "")).strip()
-                    merged_guidance = "\n".join(f"- {g}" for g in guidances)
-                    regen_context = dict(generation_context)
-                    regen_context["review_feedback"] = merged_guidance
-                    new_content = self._run_with_rate_limit_control(
-                        "score_regen_section",
-                        self.generation_agent.writer.generate_section,
-                        section_title=target_title,
-                        context=regen_context,
-                        template_fragment=self.generation_agent._extract_template_fragment(
-                            template_text, target_title
-                        ),
-                        architecture_contract=json.dumps(architecture, ensure_ascii=False, indent=2),
-                        relevant_notion_content=relevance_content.get(target_title, ""),
-                        existing_sections_summary=self.generation_agent._summarize_existing_sections(
-                            proposal_sections
-                        ),
-                        review_feedback=merged_guidance,
-                    )
-                    if new_content:
-                        proposal_sections[idx]["content"] = str(new_content).strip()
-                        regen_done += 1
+                        if regen_done >= self.max_score_regeneration:
+                            break
 
             self._log_step("score_evaluation_completed", {
                 "score": score_val,
@@ -623,8 +610,6 @@ class OrchestratorAgent:
             return final_output
 
         except Exception as e:
-            logger.error("[Orchestrator] workflow_error: %s", e)
-            traceback.print_exc()
             self._log_step("workflow_error", {"error": str(e)})
             return {
                 "success": False,

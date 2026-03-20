@@ -1,0 +1,66 @@
+{
+  "analysis": {
+    "clientInfo": {
+      "companyName": "Ciclope Corporations",
+      "projectName": "Backup de On-Premises",
+      "contactEmail": null,
+      "contactPerson": null
+    },
+    "businessRequirements": [
+      "Garantir cópias dos dados em SP e Norte Virginia",
+      "Migrar 5TB de dados, principalmente arquivos de vídeo, para a nuvem AWS",
+      "Decomissionar dados locais após a migração"
+    ],
+    "technicalRequirements": [
+      "Implementar solução de backup na AWS",
+      "Configurar replicação de dados entre regiões"
+    ],
+    "scope": {
+      "included": [
+        "Planejamento da arquitetura de backup",
+        "Implementação do processo de migração",
+        "Configuração de cópias em múltiplas regiões"
+      ],
+      "excluded": [
+        "Manutenção de infraestrutura on-premises",
+        "Suporte a dados não relacionados a vídeo"
+      ]
+    },
+    "technologies": [
+      "AWS S3",
+      "AWS Backup",
+      "AWS DataSync"
+    ],
+    "constraints": [
+      "Limitações de largura de banda para transferência de dados",
+      "Regulamentações de armazenamento de dados"
+    ],
+    "timeline": null,
+    "budget": null,
+    "notionScopes": [],
+    "confidence": 0.8,
+    "dataGaps": [
+      {
+        "field": "timeline",
+        "description": "Para planejar as etapas de migração e implementação.",
+        "required": true,
+        "suggestedQuestions": [
+          "Qual é o prazo para a conclusão do projeto?",
+          "Existem datas específicas que devemos considerar?"
+        ]
+      },
+      {
+        "field": "budget",
+        "description": "Para alinhar a proposta com as expectativas financeiras do cliente.",
+        "required": true,
+        "suggestedQuestions": [
+          "Qual é o orçamento disponível para este projeto?",
+          "Há limites financeiros que devemos respeitar?"
+        ]
+      }
+    ]
+  },
+  "input_text": "gere uma proposta para Ciclope Corporations. Trata-se de um projeto de backup de onpremises. Os dados estão em Recife, em torno de 5TB de dados. Principalmente arquivos de video. Precisamos garantir uma copia na região de SP e outra em Norte Virginia. Precisamos garantir que todos os dados estejam na nuvem AWS antes de decomissionarmos os dados locais. Sugira uma arquitetura e contrua a proposta. se precisar de alguma informação adicional me pergunte.",
+  "input_type": "natural_language",
+  "timestamp": "2026-03-20T09:51:25.118587"
+}

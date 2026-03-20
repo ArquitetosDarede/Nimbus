@@ -38,7 +38,7 @@ class ConversionAgent:
         self.agent = Agent(
             model=OpenAIModel(
                 client_args={
-                    "max_retries": 0,
+                    "max_retries": 2,
                     "timeout": 90,
                 },
                 model_id="gpt-4o",

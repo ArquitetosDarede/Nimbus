@@ -18,10 +18,10 @@ from .analysis_agent import AnalysisAgent
 from .architecture_agent import ArchitectureAgent
 from .coherence_agent import CoherenceAgent
 from .conversion_agent import ConversionAgent
-from .generation_agent import GenerationAgent
+from .generation_agent_v2 import GenerationAgent
 from .interaction_agent import InteractionAgent
 from .notion_relevance_mapper import NotionRelevanceMapper
-from .orchestrator import OrchestratorAgent
+from .orchestrator_v2 import OrchestratorAgent
 from .score_evaluator_agent import ScoreEvaluatorAgent
 from .writer_agent import WriterAgent
 
