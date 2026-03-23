@@ -27,3 +27,7 @@ _scratch/
 
 # IDE settings (keep project-specific VS Code configs tracked if needed)
 .vscode/*.log
+
+# Old proposals 
+propostas/
+
