@@ -30,6 +30,71 @@ O principal fluxo de uso do Nimbus é via chat integrado ao VSCode ou Amazon Kir
 
 ---
 
+## 📎 Análise de Arquivos Anexados
+
+O Nimbus suporta análise inteligente de arquivos anexados para enriquecer propostas técnicas:
+
+### Formatos Suportados
+- **PDF** (.pdf): Texto completo e extração de tabelas
+- **Word** (.docx): Texto, tabelas e formatação estrutural
+- **Excel** (.xlsx, .xls): Planilhas como dados tabulares
+- **CSV** (.csv): Dados tabulares com detecção automática de delimitadores
+- **Texto** (.txt): Arquivos de texto plano com múltiplos encodings
+
+### Fontes de Arquivos
+- **Locais**: Caminhos absolutos/relativos no sistema de arquivos
+- **S3**: URLs no formato `s3://bucket-name/key-name`
+- **Auto-detecção**: Arquivos relevantes no workspace atual do VSCode/Kiro
+
+### Como Usar
+
+#### 1. Arquivos Locais
+```python
+# Anexar arquivos específicos
+orchestrator.generate_proposal(
+    "Preciso de uma proposta para sistema web",
+    file_paths=["C:\\docs\\requisitos.pdf", "C:\\dados\\planilha.xlsx"]
+)
+```
+
+#### 2. Arquivos S3
+```python
+# Usar arquivos do S3
+orchestrator.generate_proposal(
+    "Preciso de uma proposta para sistema web",
+    file_paths=["s3://my-bucket/requirements.pdf", "s3://my-bucket/data.xlsx"]
+)
+```
+
+#### 3. Auto-detecção
+```python
+# Detectar automaticamente arquivos relevantes no workspace
+orchestrator.generate_proposal(
+    "Preciso de uma proposta para sistema web",
+    auto_detect_files=True
+)
+```
+
+### Como Funciona
+1. **Upload/Acesso**: Arquivos locais são lidos diretamente, S3 são baixados temporariamente
+2. **Detecção**: Auto-detecção encontra PDFs, docs, planilhas no diretório atual
+3. **Análise Automática**: Sistema detecta tipo e extrai conteúdo relevante
+4. **Integração**: Conteúdo é incorporado ao contexto da proposta na IA
+5. **Fallback Graceful**: Sistema continua funcionando mesmo sem bibliotecas específicas
+
+### Arquitetura de Análise
+O `AnalysisAgent` integra diretamente os agentes especializados:
+- `PDFAnalysisAgent` (usa PyPDF2 + pdfplumber)
+- `DocxAnalysisAgent` (usa python-docx)
+- `XlsxAnalysisAgent` (usa openpyxl)
+- `CsvAnalysisAgent` (nativo com detecção de encoding)
+- `TxtAnalysisAgent` (nativo com detecção de encoding)
+
+Para S3: `S3FileReader` baixa arquivos temporariamente antes da análise.
+Para auto-detecção: `WorkspaceFileDetector` escaneia diretório por arquivos relevantes.
+
+---
+
 ## 🏗️ Arquitetura e Fluxo dos Agentes
 
 ```mermaid
@@ -146,7 +211,12 @@ secoes = generation_agent.generate_full_proposal(resultado)
 ## 🧩 Estrutura dos Agentes
 
 - **OrchestratorAgent**: Orquestra todo o fluxo, mantém estado e auditoria
-- **AnalysisAgent**: Analisa requisitos do cliente
+- **AnalysisAgent**: Analisa requisitos do cliente e conteúdo de arquivos anexados
+  - **PDFAnalysisAgent**: Extrai texto e tabelas de arquivos PDF
+  - **DocxAnalysisAgent**: Extrai texto e tabelas de documentos Word (.docx)
+  - **XlsxAnalysisAgent**: Extrai dados de planilhas Excel (.xlsx, .xls)
+  - **CsvAnalysisAgent**: Processa arquivos CSV com detecção automática de delimitadores
+  - **TxtAnalysisAgent**: Processa arquivos de texto plano com detecção de encoding
 - **ArchitectureAgent**: Gera arquitetura e avalia segurança
 - **NotionRelevanceMapper**: Mapeia seções do template para conteúdos do Notion
 - **GenerationAgent**: Gera texto de cada seção da proposta

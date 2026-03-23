@@ -269,14 +269,14 @@ class OrchestratorAgent:
     # Public API
     # -------------------------------------------------------------------------
 
-    def analyze_requirements(self, input_text: str, input_type: str = "text") -> Dict[str, Any]:
+    def analyze_requirements(self, input_text: str, input_type: str = "text", file_paths: List[str] = None, auto_detect_files: bool = False) -> Dict[str, Any]:
         gate = self._ensure_notion_cache_ready()
         if isinstance(gate, dict):
             return gate
         cache_str = self._format_notion_cache_summary()
-        return self.analysis_agent.analyze(input_text, input_type=input_type, notion_cache=cache_str)
+        return self.analysis_agent.analyze(input_text, input_type=input_type, notion_cache=cache_str, file_paths=file_paths, auto_detect_files=auto_detect_files)
 
-    def generate_proposal(self, user_input: str, session_id: str | None = None) -> Dict[str, Any]:
+    def generate_proposal(self, user_input: str, session_id: str | None = None, file_paths: List[str] = None, auto_detect_files: bool = False) -> Dict[str, Any]:
         """Generate a complete proposal using the new multi-agent workflow."""
         if not isinstance(user_input, str) or not user_input.strip():
             return {
@@ -310,6 +310,8 @@ class OrchestratorAgent:
                 user_input,
                 input_type="natural_language",
                 notion_cache=cache_str,
+                file_paths=file_paths,  # ← Passa arquivos para análise
+                auto_detect_files=auto_detect_files,  # ← Adiciona auto-detecção
             )
             if isinstance(analysis_result, dict) and (
                 analysis_result.get("status") == "analysis_failed" or analysis_result.get("error")
