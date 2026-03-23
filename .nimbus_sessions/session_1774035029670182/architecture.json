@@ -1,0 +1,86 @@
+{
+  "solution_summary": "A proposta de arquitetura para Ciclope Corporations envolve a migração de 5TB de dados de vídeo de Recife para a AWS, garantindo cópias em São Paulo e Norte da Virgínia. Utilizaremos AWS DataSync para transferir dados on-premises para o Amazon S3, que será configurado com replicação entre regiões para atender aos requisitos de backup e recuperação de desastres.",
+  "services": [
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir dados de vídeo de 5TB de Recife para a AWS",
+      "configuration": "Configurar agente DataSync on-premises para transferir dados para o Amazon S3",
+      "region": "us-east-1",
+      "justification": "Necessário para migrar dados on-premises para a nuvem AWS"
+    },
+    {
+      "service": "Amazon S3",
+      "purpose": "Armazenar dados de vídeo com alta durabilidade e replicação entre regiões",
+      "configuration": "Configurar buckets S3 com replicação entre regiões de São Paulo para Norte da Virgínia",
+      "region": "sa-east-1",
+      "justification": "Necessário para armazenar dados e garantir cópias em múltiplas regiões"
+    },
+    {
+      "service": "Amazon S3 Cross-Region Replication",
+      "purpose": "Replicar dados de São Paulo para Norte da Virgínia",
+      "configuration": "Configurar regras de replicação S3 para garantir cópias em ambas as regiões",
+      "region": "us-east-1",
+      "justification": "Necessário para atender ao requisito de cópias de dados em múltiplas regiões"
+    }
+  ],
+  "regions": [
+    {
+      "region": "sa-east-1",
+      "purpose": "Proximidade com Recife para menor latência e conformidade local"
+    },
+    {
+      "region": "us-east-1",
+      "purpose": "Redundância e recuperação de desastres"
+    }
+  ],
+  "data_flow": "Os dados são transferidos de Recife para o Amazon S3 na região de São Paulo usando AWS DataSync. Em seguida, o Amazon S3 realiza a replicação dos dados para a região de Norte da Virgínia.",
+  "security_controls": [
+    {
+      "control": "Criptografia em repouso",
+      "scope": "Protege dados armazenados no Amazon S3",
+      "implementation": "Habilitar criptografia AES-256 para buckets S3"
+    },
+    {
+      "control": "Controle de acesso baseado em IAM",
+      "scope": "Protege acesso a serviços AWS",
+      "implementation": "Configurar políticas IAM para acesso restrito aos recursos S3 e DataSync"
+    }
+  ],
+  "patterns": [
+    "Cross-Region Replication",
+    "Data Migration"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Configuração de agentes e rede para transferência de dados"
+      },
+      {
+        "component": "Amazon S3",
+        "complexity": "low",
+        "reason": "Configuração de buckets e políticas de replicação"
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual é o prazo para a migração dos dados?",
+      "impact": "Ajudaria a planejar a execução do projeto e alocar recursos adequadamente",
+      "priority": "high",
+      "default_assumption": "Assumimos que a migração deve ser concluída em 3 meses"
+    },
+    {
+      "question": "Qual é o orçamento disponível para este projeto?",
+      "impact": "Garantiria que a solução proposta esteja dentro das expectativas financeiras",
+      "priority": "high",
+      "default_assumption": "Assumimos que não há restrições financeiras significativas"
+    }
+  ],
+  "assumptions": [
+    "A largura de banda disponível é suficiente para transferir 5TB de dados dentro do prazo assumido",
+    "Os dados não possuem requisitos de conformidade específicos além da replicação entre regiões"
+  ]
+}

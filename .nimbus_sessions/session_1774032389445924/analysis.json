@@ -1,0 +1,65 @@
+{
+  "analysis": {
+    "clientInfo": {
+      "companyName": "BeFly",
+      "projectName": "Migração da Azure para a AWS",
+      "contactEmail": null,
+      "contactPerson": null
+    },
+    "businessRequirements": [
+      "Migrar 30 VMs Windows para a AWS",
+      "Migrar 10 TB de dados do Blob para a AWS"
+    ],
+    "technicalRequirements": [
+      "Utilizar AWS MGN para migração das VMs",
+      "Utilizar AWS DataSync para migração do Blob"
+    ],
+    "scope": {
+      "included": [
+        "Planejamento da migração",
+        "Execução da migração das VMs e do Blob",
+        "Configuração de ambientes na AWS"
+      ],
+      "excluded": [
+        "Suporte pós-migração",
+        "Manutenção de infraestrutura na Azure"
+      ]
+    },
+    "technologies": [
+      "AWS MGN",
+      "AWS DataSync",
+      "AWS EC2"
+    ],
+    "constraints": [
+      "Limitações de largura de banda durante a migração",
+      "Compatibilidade de aplicações nas VMs"
+    ],
+    "timeline": null,
+    "budget": null,
+    "notionScopes": [],
+    "confidence": 0.8,
+    "dataGaps": [
+      {
+        "field": "timeline",
+        "description": "Para planejar as etapas de migração e garantir que o projeto seja concluído dentro do prazo.",
+        "required": true,
+        "suggestedQuestions": [
+          "Qual é o prazo para a conclusão da migração?",
+          "Existem datas específicas que devemos considerar para a migração?"
+        ]
+      },
+      {
+        "field": "budget",
+        "description": "Para alinhar a proposta com as expectativas financeiras do cliente.",
+        "required": true,
+        "suggestedQuestions": [
+          "Qual é o orçamento disponível para este projeto?",
+          "Há limites financeiros que devemos respeitar durante a migração?"
+        ]
+      }
+    ]
+  },
+  "input_text": "crie uma proposta para a BeFly\nEsta proposta é uma migração da Azure para a AWS\n \nO cliente estará migrando 30 VMs Windows para a AWS via MGN\nEles também possuem um Blob com 10 TB que será migrado com DataSync",
+  "input_type": "natural_language",
+  "timestamp": "2026-03-20T15:46:46.947753"
+}

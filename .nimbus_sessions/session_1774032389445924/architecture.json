@@ -1,0 +1,92 @@
+{
+  "solution_summary": "A proposta de arquitetura para a BeFly envolve a migração de 30 VMs Windows da Azure para a AWS utilizando o AWS MGN, e a transferência de 10 TB de dados do Azure Blob para a AWS usando o AWS DataSync. A solução garante uma migração eficiente e segura, com configuração de ambientes na AWS para suportar as operações pós-migração.",
+  "services": [
+    {
+      "service": "AWS MGN",
+      "purpose": "Migrar 30 VMs Windows da Azure para a AWS de forma eficiente.",
+      "configuration": "Configurar replicação contínua das VMs e realizar testes de migração antes do corte final.",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar VMs Windows para a AWS."
+    },
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir 10 TB de dados do Azure Blob para a AWS.",
+      "configuration": "Configurar DataSync para acessar o Azure Blob usando SAS tokens e transferir dados para o S3.",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar dados do Blob para a AWS."
+    },
+    {
+      "service": "Amazon EC2",
+      "purpose": "Hospedar as VMs Windows migradas na AWS.",
+      "configuration": "Selecionar tipos de instância adequados para as VMs migradas.",
+      "region": "us-east-1",
+      "justification": "Execução das VMs Windows na AWS após a migração."
+    }
+  ],
+  "regions": [
+    {
+      "region": "us-east-1",
+      "purpose": "Proximidade com a maioria dos usuários finais e suporte a serviços AWS necessários."
+    }
+  ],
+  "data_flow": "As VMs Windows são replicadas da Azure para a AWS usando AWS MGN. Os dados do Azure Blob são transferidos para o Amazon S3 usando AWS DataSync, configurado com SAS tokens para acesso seguro.",
+  "security_controls": [
+    {
+      "control": "Criptografia em repouso",
+      "scope": "Dados armazenados no S3",
+      "implementation": "Utilizar AWS KMS para gerenciar chaves de criptografia."
+    },
+    {
+      "control": "Controle de acesso baseado em IAM",
+      "scope": "Acesso aos serviços AWS",
+      "implementation": "Definir políticas de IAM para restringir acesso a usuários autorizados."
+    },
+    {
+      "control": "Criptografia em trânsito",
+      "scope": "Dados transferidos entre Azure e AWS",
+      "implementation": "Utilizar TLS/SSL para proteger dados em trânsito."
+    }
+  ],
+  "patterns": [
+    "Lift-and-Shift",
+    "Hybrid Cloud"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS MGN",
+        "complexity": "medium",
+        "reason": "Configuração de replicação contínua e testes de migração."
+      },
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Configuração de transferências seguras usando SAS tokens."
+      },
+      {
+        "component": "Amazon EC2",
+        "complexity": "low",
+        "reason": "Configuração de instâncias para hospedar VMs migradas."
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual é o prazo para a conclusão da migração?",
+      "impact": "Permite planejar as etapas de migração e garantir que o projeto seja concluído dentro do prazo.",
+      "priority": "high",
+      "default_assumption": "Assumimos que a migração deve ser concluída em 6 meses."
+    },
+    {
+      "question": "Qual é o orçamento disponível para este projeto?",
+      "impact": "Ajuda a alinhar a proposta com as expectativas financeiras do cliente.",
+      "priority": "high",
+      "default_assumption": "Assumimos que o orçamento é suficiente para cobrir os serviços AWS recomendados."
+    }
+  ],
+  "assumptions": [
+    "As VMs Windows são compatíveis com a AWS.",
+    "A largura de banda disponível é suficiente para a transferência de dados em um período razoável."
+  ]
+}
