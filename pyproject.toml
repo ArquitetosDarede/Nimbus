@@ -15,6 +15,13 @@ dev = [
     "black>=23.0.0",
     "ruff>=0.1.0"
 ]
+file-analysis = [
+    "PyPDF2>=3.0.0",           # PDF extraction
+    "pdfplumber>=0.10.0",      # PDF tables
+    "python-docx>=0.8.11",     # DOCX support
+    "openpyxl>=3.10.0",        # XLSX support
+    "boto3>=1.34.0"            # AWS S3 support
+]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

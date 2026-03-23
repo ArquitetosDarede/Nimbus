@@ -251,6 +251,16 @@ async def list_tools() -> List[Tool]:
                         "type": "string",
                         "description": "Type of input: text, transcript, email",
                         "default": "text"
+                    },
+                    "file_paths": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of local file paths to analyze (PDF, DOCX, XLSX, CSV, TXT)"
+                    },
+                    "auto_detect_files": {
+                        "type": "boolean",
+                        "description": "Automatically detect relevant files in current workspace",
+                        "default": false
                     }
                 },
                 "required": ["input_text"]
@@ -397,6 +407,8 @@ async def call_tool(name: str, arguments: Any) -> List[TextContent]:
         elif name == "analyze_requirements":
             input_text = arguments["input_text"]
             input_type = arguments.get("input_type", "text")
+            file_paths = arguments.get("file_paths", None)
+            auto_detect_files = arguments.get("auto_detect_files", False)
 
             logger.info("[Orchestrator] Analyzing requirements via analysis sub-agent")
 
@@ -404,6 +416,8 @@ async def call_tool(name: str, arguments: Any) -> List[TextContent]:
                 orchestrator.analyze_requirements,
                 input_text,
                 input_type,
+                file_paths,
+                auto_detect_files,
             )
             if isinstance(result, dict):
                 result["assistant_message"] = _build_general_assistant_message("analyze_requirements", result)
