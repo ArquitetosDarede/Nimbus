@@ -178,6 +178,10 @@ class GenerationAgent:
                 if content_retry and not self._is_content_duplicate(content_retry, sections):
                     content = content_retry
 
+            # Marca como gerado por IA se não houver base explícita do Notion
+            if not relevant_notion.strip():
+                content = f"<gerado por IA>{content}</gerado por IA>"
+
             sections.append({
                 "title": f"{idx}. {section_title}",
                 "content": content,

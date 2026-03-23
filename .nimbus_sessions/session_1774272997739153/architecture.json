@@ -1,0 +1,103 @@
+{
+  "solution_summary": "A proposta de arquitetura para Ciclope Corporations envolve a migração de 5TB de dados de vídeo de Recife para a AWS, garantindo cópias de backup nas regiões de São Paulo e Norte da Virgínia. Utilizaremos AWS DataSync para transferência eficiente de dados, AWS S3 para armazenamento seguro e AWS Backup para gerenciamento de backups.",
+  "services": [
+    {
+      "service": "AWS DataSync",
+      "purpose": "Transferir dados de forma eficiente e segura de Recife para a AWS",
+      "configuration": "Configurar agentes locais para sincronização contínua de dados",
+      "region": "us-east-1",
+      "justification": "Necessidade de migrar 5TB de dados para a nuvem AWS"
+    },
+    {
+      "service": "Amazon S3",
+      "purpose": "Armazenamento seguro e escalável dos dados de vídeo",
+      "configuration": "Utilizar a classe de armazenamento S3 Standard para acesso frequente",
+      "region": "sa-east-1",
+      "justification": "Armazenar dados na região de São Paulo para proximidade geográfica"
+    },
+    {
+      "service": "Amazon S3",
+      "purpose": "Armazenamento seguro e escalável dos dados de vídeo",
+      "configuration": "Utilizar a classe de armazenamento S3 Standard para acesso frequente",
+      "region": "us-east-1",
+      "justification": "Armazenar dados na região de Norte da Virgínia para redundância"
+    },
+    {
+      "service": "AWS Backup",
+      "purpose": "Gerenciar e automatizar o backup dos dados armazenados no S3",
+      "configuration": "Configurar políticas de backup para replicação entre regiões",
+      "region": "sa-east-1",
+      "justification": "Garantir que todos os dados estejam na nuvem antes de descomissionar os dados locais"
+    }
+  ],
+  "regions": [
+    {
+      "region": "sa-east-1",
+      "purpose": "Proximidade geográfica com Recife para menor latência"
+    },
+    {
+      "region": "us-east-1",
+      "purpose": "Redundância e recuperação de desastres"
+    }
+  ],
+  "data_flow": "Os dados são transferidos de Recife para a AWS usando AWS DataSync, inicialmente para a região de São Paulo. Em seguida, são replicados para a região de Norte da Virgínia usando políticas de replicação do S3.",
+  "security_controls": [
+    {
+      "control": "Criptografia em repouso",
+      "scope": "Proteção dos dados armazenados no S3",
+      "implementation": "Utilizar AWS KMS para gerenciar chaves de criptografia"
+    },
+    {
+      "control": "Criptografia em trânsito",
+      "scope": "Proteção dos dados durante a transferência",
+      "implementation": "Utilizar TLS para todas as transferências de dados"
+    },
+    {
+      "control": "Controle de acesso baseado em IAM",
+      "scope": "Gerenciamento de permissões de acesso aos dados",
+      "implementation": "Configurar políticas de IAM para acesso restrito"
+    }
+  ],
+  "patterns": [
+    "Active-Passive DR",
+    "Hub-Spoke"
+  ],
+  "complexity_estimate": {
+    "overall": "medium",
+    "components": [
+      {
+        "component": "AWS DataSync",
+        "complexity": "medium",
+        "reason": "Configuração de agentes locais e sincronização contínua"
+      },
+      {
+        "component": "Amazon S3",
+        "complexity": "low",
+        "reason": "Configuração simples de buckets e políticas de replicação"
+      },
+      {
+        "component": "AWS Backup",
+        "complexity": "medium",
+        "reason": "Configuração de políticas de backup e replicação entre regiões"
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "question": "Qual é a data limite para a migração dos dados?",
+      "impact": "Ajudaria a definir um cronograma detalhado para a migração",
+      "priority": "high",
+      "default_assumption": "Assumimos que a migração deve ser concluída em 3 meses"
+    },
+    {
+      "question": "Qual é o orçamento disponível para este projeto?",
+      "impact": "Permite ajustar a solução para caber dentro das restrições financeiras",
+      "priority": "high",
+      "default_assumption": "Assumimos que não há restrições financeiras significativas"
+    }
+  ],
+  "assumptions": [
+    "A largura de banda disponível é suficiente para a transferência de 5TB de dados dentro do prazo assumido.",
+    "Não há requisitos de conformidade específicos além dos padrões de segurança AWS."
+  ]
+}
