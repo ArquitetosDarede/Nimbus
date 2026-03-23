@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 class OrchestratorAgent:
     """Coordinates analysis, architecture, generation, coherence, and evaluation flows."""
 
-    def __init__(self, notion_cache_layer=None, aws_mcp_client=None):
+    def __init__(self, notion_cache_layer=None, aws_mcp_client=None, aws_knowledge_mcp_client=None):
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable is required")
 
@@ -63,7 +63,7 @@ class OrchestratorAgent:
 
         # Agents
         self.analysis_agent = AnalysisAgent()
-        self.architecture_agent = ArchitectureAgent(aws_mcp_client=aws_mcp_client)
+        self.architecture_agent = ArchitectureAgent(aws_mcp_client=aws_mcp_client, aws_knowledge_mcp_client=aws_knowledge_mcp_client)
         self.relevance_mapper = NotionRelevanceMapper()
         self.generation_agent = GenerationAgent()
         self.coherence_agent = CoherenceAgent()

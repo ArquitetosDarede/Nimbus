@@ -38,6 +38,19 @@ try:
 except Exception as e:
     logger.info(f"ℹ️ AWS Documentation MCP client not available: {e}")
 
+# Initialize optional AWS Knowledge MCP Client (remote HTTP)
+aws_knowledge_mcp_client = None
+try:
+    from tools.aws_knowledge_mcp_client import create_aws_knowledge_mcp_client
+    logger.info("Creating AWS Knowledge MCP client...")
+    aws_knowledge_mcp_client = create_aws_knowledge_mcp_client()
+    if aws_knowledge_mcp_client:
+        logger.info("✅ AWS Knowledge MCP client started successfully (remote HTTP)")
+    else:
+        logger.info("ℹ️ AWS Knowledge MCP client not available — architecture agent will work without it")
+except Exception as e:
+    logger.info(f"ℹ️ AWS Knowledge MCP client not available: {e}")
+
 # Initialize the Notion Cache Layer (local SQLite mirror of the entire workspace)
 notion_cache_layer = None
 try:
@@ -55,6 +68,7 @@ try:
     orchestrator = OrchestratorAgent(
         notion_cache_layer=notion_cache_layer,
         aws_mcp_client=aws_mcp_client,
+        aws_knowledge_mcp_client=aws_knowledge_mcp_client,
     )
     logger.info("✅ OrchestratorAgent v2 initialized successfully")
 except Exception as e:

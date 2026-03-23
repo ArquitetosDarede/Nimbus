@@ -48,11 +48,15 @@ Rules:
 class ArchitectureAgent:
     """Produces the architectural contract and identifies enrichment gaps."""
 
-    def __init__(self, aws_mcp_client=None):
+    def __init__(self, aws_mcp_client=None, aws_knowledge_mcp_client=None):
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable is required")
 
-        tools = [aws_mcp_client] if aws_mcp_client else []
+        tools = []
+        if aws_mcp_client:
+            tools.append(aws_mcp_client)
+        if aws_knowledge_mcp_client:
+            tools.append(aws_knowledge_mcp_client)
 
         try:
             self.agent = Agent(
