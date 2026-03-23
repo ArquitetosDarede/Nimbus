@@ -191,9 +191,16 @@ class OrchestratorAgent:
         return None
 
     def _get_template_text_from_notion_cache(self) -> str:
+        # Busca o template de proposta pelo page_id fornecido
+        TEMPLATE_PAGE_ID = "32c78f568aaf803bb459f32a6d69b97d"
         cache = self.state.get("notion_cache", {})
         if not isinstance(cache, dict) or not cache:
             return ""
+        # Busca pelo page_id exato
+        page = cache.get(TEMPLATE_PAGE_ID)
+        if page and isinstance(page, dict):
+            return str(page.get("text", ""))
+        # Fallback: busca pelo título
         for value in cache.values():
             if not isinstance(value, dict):
                 continue
